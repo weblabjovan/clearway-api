@@ -15,6 +15,10 @@ module.exports = app => {
 		})
 	);
 
+	app.get('/api/test', (req, res) => {
+		res.status(200).send('Test is done!');
+	})
+
 	app.get('/api/auth/google/callback', passport.authenticate('google'), (req, res) => {
 		if (req.user) {
 			const token = jsonWebToken(req.user);
