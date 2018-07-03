@@ -8,6 +8,7 @@ const welcomeTemplate = require('../templates/emailTemplates/welcomeTemplate');
 const passcodeTemplate = require('../templates/emailTemplates/passcodeTemplate');
 const generator = require('generate-password');
 const bcrypt = require('bcryptjs');
+const keys = require('../keys/keys');
 
 module.exports = app => {
 	app.get('/api/auth/google', passport.authenticate('google', {
@@ -22,7 +23,7 @@ module.exports = app => {
 	app.get('/api/auth/google/callback', passport.authenticate('google'), (req, res) => {
 		if (req.user) {
 			const token = jsonWebToken(req.user);
-			res.redirect('/dashboard/' + token);
+			res.redirect(keys.clientURI + '/dashboard/' + token);
 		}else{
 			res.status(400).json({error: 'Problem with Google Server'});
 		}
