@@ -23,6 +23,7 @@ module.exports = app => {
 	app.get('/api/auth/google/callback', passport.authenticate('google'), (req, res) => {
 		if (req.user) {
 			const token = jsonWebToken(req.user);
+			console.log(keys.clientURI);
 			res.redirect(keys.clientURI + '/dashboard/' + token);
 		}else{
 			res.status(400).json({error: 'Problem with Google Server'});
