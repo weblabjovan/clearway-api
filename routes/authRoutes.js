@@ -16,21 +16,16 @@ module.exports = app => {
 		})
 	);
 
-	app.get('/api/test', (req, res) => {
-		res.status(200).send('Test is done!');
-	})
-
 	app.get('/api/auth/google/callback', passport.authenticate('google'), (req, res) => {
 		if (req.user) {
 			const token = jsonWebToken(req.user);
-			console.log(keys.clientURI);
 			res.redirect(keys.clientURI + '/dashboard/' + token);
 		}else{
 			res.status(400).json({error: 'Problem with Google Server'});
 		}
 	});
 
-	app.post('/api/findUserByEmail', async (req, res) => {
+	app.post('/api/user/findByEmail', async (req, res) => {
 		const user = await User.findOne({email: req.body.email});
 		if (user) {
 			const passcode = generator.generate({
@@ -49,7 +44,7 @@ module.exports = app => {
 		}
 	});
 
-	app.post('/api/checkPasscode', async (req, res) => {
+	app.post('/api/user/checkPasscode', async (req, res) => {
 		const { email, passcode } = req.body;
 		const user = await User.findOne({email, passcode});
 		if (user) {
@@ -61,7 +56,7 @@ module.exports = app => {
 
 	});
 
-	app.post('/api/changePassword', async (req, res) => {
+	app.post('/api/user/changePassword', async (req, res) => {
 		const { email, password } = req.body;
 		const user = await User.findOne({email});
 		if (user) {
@@ -78,7 +73,7 @@ module.exports = app => {
 		res.status(200).send(req.user);
 	});
 
-	app.get('/api/isUserLogged', passport.authenticate('jwt', { session: false }), (req, res) => {
+	app.get('/api/user/isUserLogged', passport.authenticate('jwt', { session: false }), (req, res) => {
 		res.status(200).send({logged: true});
 	});
 

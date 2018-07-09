@@ -12,9 +12,8 @@ AWS.config.correctClockSkew = true;
 const s3 = new AWS.S3({
 	accessKeyId: keys.accessKeyId,
 	secretAccessKey: keys.secretAccessKey,
-	endpoint: 's3-eu-central-1.amazonaws.com',
 	signatureVersion: 'v4',
-	region: 'eu-central-1'
+	region: 'us-east-2'
 });
 
 module.exports = app => {
@@ -25,9 +24,8 @@ module.exports = app => {
 
 			s3.getSignedUrl('putObject', 
 			{
-				Bucket: 'profile-claro-bucket',
-				ContentType: 'image/*',
-				Expires: 100,
+				Bucket: 'clearway-profile',
+				ContentType: 'image/jpeg',
 				Key: key
 			}, 
 			(err, url) => res.send({key, url}))

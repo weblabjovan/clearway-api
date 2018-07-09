@@ -5,7 +5,7 @@ const routeSchema = new Schema({
 	user: {type: String, required: true},
 	start: {type: String, required: true},
 	end: {type: String, required: true},
-	time: {type: Number, required: true},
+	time: {type: String, required: true},
 	frequency: {type: Number, required: true},
 	spots: {type: Number, required: true},
 	price: {type: Number, required: true},
