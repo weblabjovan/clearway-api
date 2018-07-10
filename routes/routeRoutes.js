@@ -57,7 +57,7 @@ module.exports = app => {
 			]
 		});
 		
-		let result = searchRoutes(routes, req.body.startObj, req.body.endObj);
+		let result = searchRoutes(routes, req.body.startObj, req.body.endObj, req.body.distance);
 		try{
 
 			result = await decorateSearchObjects(result);

@@ -9,7 +9,7 @@ const userSchema = new Schema({
 	passcode: {type:String, default: ''},
 	date: {type: Date, required: true},
 	name: {type: String},
-	phone: {type: Number},
+	phone: {type: String},
 	gender: {type: String},
 	birthYear: {type: Number},
 	userType: {type: String},

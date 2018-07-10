@@ -1,17 +1,17 @@
 const distanceMeter = require('./distanceMeter');
 
-module.exports = (routes, startObj, endObj) => {
+module.exports = (routes, startObj, endObj, distance) => {
 
 	return routes.filter( route => {
 		let start = false;
 		let end = false;
 		
 		route.steps.map( (step, index) => {
-			if (distanceMeter(step, startObj) < 150) {
+			if (distanceMeter(step, startObj) < distance) {
 
 				start = index;
 			}
-			if (distanceMeter(step, endObj) < 150) {
+			if (distanceMeter(step, endObj) < distance) {
 				end = index;
 			}
 		});
