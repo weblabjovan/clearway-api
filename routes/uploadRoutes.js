@@ -20,12 +20,12 @@ module.exports = app => {
 
 	app.get('/api/user/photoUpload', passport.authenticate('jwt', { session: false }), (req, res) => {
 		if (req.user) {
-			const key = `${req.user.id}/${uuid()}.jpeg`;
+			const key = `${req.user.id}/${uuid()}.jpg`;
 
 			s3.getSignedUrl('putObject', 
 			{
-				Bucket: 'clearway-profile',
-				ContentType: 'image/jpeg',
+				Bucket: 'claro-profile-bucket',
+				ContentType: 'image/jpg',
 				Key: key
 			}, 
 			(err, url) => res.send({key, url}))
