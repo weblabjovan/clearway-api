@@ -36,11 +36,11 @@ module.exports = app => {
 			});
 			const updatedUser = await User.findOneAndUpdate({_id: user.id}, {passcode: passcode}, {new: true});
 			const recipient = [req.body.email];
-			const mailer = new Mailer('Password change code', recipient, passcodeTemplate(updatedUser));
+			const mailer = new Mailer('Sigurnosni kod za promenu lozinke', recipient, passcodeTemplate(updatedUser));
 			await mailer.send();
 			res.status(200).send({email: req.body.email});
 		}else{
-			res.status(400).json({error: 'No user with provided email'});
+			res.status(400).json({error: 'Ne postoji korisnik sa unetim emailom.'});
 		}
 	});
 
@@ -51,7 +51,7 @@ module.exports = app => {
 			await User.update({_id: user.id}, {passcode: ''});
 			res.status(200).send({passcode: true});
 		}else{
-			res.status(400).json({error: 'Invalid password change code'});
+			res.status(400).json({error: 'Nevalidan kod za promenu lozinke'});
 		}
 
 	});
@@ -82,7 +82,7 @@ module.exports = app => {
 			const token = jsonWebToken(req.user);
 			res.status(200).send(token);
 		}else{
-			res.status(400).json({error: 'No user with provided data'});
+			res.status(400).json({error: 'Ne postoji korisnik sa unetim podacima'});
 		}
 	});
 
@@ -116,7 +116,7 @@ module.exports = app => {
 		const { sign_username, sign_email, sign_pass } = req.body;
 		const user = await User.findOne({ email: sign_email });
 		if (user) {
-			res.status(403).json({error: 'User with this email already exists'});
+			res.status(403).json({error: 'Korisnik sa ovim email-om već postoji'});
 		}else{
 			const newUser = new User({
 				username: sign_username,
