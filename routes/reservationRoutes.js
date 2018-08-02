@@ -11,6 +11,7 @@ module.exports = app => {
 
 		const nDate = Object.create(nodeDate);
 		nDate.init(req.body.rideDate);
+		console.log(req.body);
 		const newReservation = new Reservation({
 			issuer: req.user.id,
 			route: req.body.route,
@@ -22,7 +23,7 @@ module.exports = app => {
 		});
 
 		try{
-			await newReservation.save();
+			//await newReservation.save();
 			res.status(200).send('New reservation made.');
 		}catch(error){
 			console.log(error);

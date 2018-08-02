@@ -6,6 +6,6 @@ module.exports = async (obj) => {
 	res = res._doc;
 	const user = await User.findOne({_id: obj.user}).select('-password');
 	res.userObj = user;
-
+	
 	return res;
 }

@@ -3,14 +3,13 @@ const userDecorater = require('../users/userDecorater');
 const downsizeObject = require('../downsizeObject');
 const moment = require('moment');
 
-console.log();
 
 function getClosestSteps(route, position){
 	let start = null;
 	let end = null;
 
 	route.steps.map( (step, index) => {
-		if (distanceMeter(step, position.startObj) < 100) {
+		if (distanceMeter(step, position.startObj) < position.distance) {
 			if (!start) {
 				start = {step: index, distance: distanceMeter(step, position.startObj)}
 			}else{
@@ -20,7 +19,7 @@ function getClosestSteps(route, position){
 			}
 		}
 
-		if (distanceMeter(step, position.endObj) < 100) {
+		if (distanceMeter(step, position.endObj) < position.distance) {
 			if (!end) {
 				end = {step: index, distance: distanceMeter(step, position.endObj)}
 			}else{
@@ -35,6 +34,7 @@ function getClosestSteps(route, position){
 }
 
 function calculateRideTime(steps){
+
 	return Math.ceil((steps.end.step - steps.start.step)/3);
 }
 

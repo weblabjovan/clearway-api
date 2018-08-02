@@ -4,6 +4,9 @@ const passport = require('passport');
 const passportConf = require('../helpers/passport');
 const jsonWebToken = require('../helpers/jsonWebToken');
 const nodeDate = require('../helpers/nodeDate');
+const RouteController = require('../helpers/routes/RouteController');
+const RouteTimeController = require('../helpers/routes/RouteTimeController');
+
 const stepsDecorator = require('../helpers/routes/stepsDecorator');
 const searchRoutes = require('../helpers/routes/searchRoutes');
 const routeFreq = require('../helpers/routes/routeFrequencySearcher');
@@ -11,55 +14,74 @@ const decorateSearchObjects = require('../helpers/routes/decorateSearchObjects')
 const prepareRouteForReservation = require('../helpers/routes/prepareRouteForReservation');
 
 module.exports = app => {
-	app.post('/api/route/save', passport.authenticate('jwt', { session: false }), async (req, res) => {
-		if (req.user) {
-			const nDate = Object.create(nodeDate);
-			nDate.init(req.body.routeInfo.time);
-			const waypoints = req.body.waypoints.map( val => {
-				return {lat: val.location.lat, lng: val.location.lng};
-			})
-			let steps = req.body.steps.map( val => {
-				return {lat: val.start.lat, lng: val.start.lng};
-			});
-			steps = stepsDecorator(steps);
-
-			const newRoute = new Route({
-				user: req.user.id,
-				start: req.body.routeInfo.start,
-				end: req.body.routeInfo.end,
-				time: nDate.getOnlyTime(),
-				frequency: req.body.routeInfo.frequency,
-				spots: req.body.routeInfo.spots,
-				price: req.body.routeInfo.rate,
-				waypoints: waypoints,
-				steps: steps,
-				status: 'active',
-				activatedAt: Date.now()
-			})
-
-			try{
-				await newRoute.save();
-				res.status(200).send('Route created');
-			}catch(error){
-				console.log(error);
-				res.status(422).send(error);
-			}
-		}else{
-			res.status(400).json({error: 'User is not logged'});
+	app.post('/api/route/delete', passport.authenticate('jwt', { session: false }), async (req, res) => {
+		const MyRoute = new RouteController(req.user);
+		try{
+			await MyRoute.deleteRoute(req.body.routeId);
+			const routes = await MyRoute.getAllMyRoutes();
+			res.status(200).send(routes);
+		}catch(error){
+			console.log(error)
+			res.status(500).send(error);
 		}
 	})
 
+	app.post('/api/route/save', passport.authenticate('jwt', { session: false }), async (req, res) => {
+			const nDate = Object.create(nodeDate);
+			nDate.init(req.body.routeInfo.time);
+			const MyRoute = new RouteController(req.user);
+			const MyTimeRoute = new RouteTimeController(req.user);
+			const overlap = await MyTimeRoute.areMyRoutesOverlaping(nDate.getOnlyTime(), req.body.routeInfo.frequency, req.body.routeInfo.date);
+				if (!overlap) {
+					const waypoints = req.body.waypoints.map( val => {
+						return {lat: val.location.lat, lng: val.location.lng};
+					})
+					let steps = req.body.steps.map( val => {
+						return {lat: val.start.lat, lng: val.start.lng};
+					});
+					steps = stepsDecorator(steps);
+					const myDate = req.body.routeInfo.date || null;
+					const routeData = MyRoute.makeCreateDataObj(
+						req.body.routeInfo, 
+						waypoints, 
+						steps, 
+						nDate.getOnlyTime(),
+						nDate.calculateTimeNumber(nDate.getOnlyTime()),
+						myDate,
+						nDate.calculateDateNumber(myDate)
+					);
+					const route = await MyRoute.createRoute(routeData);
+
+					try{
+						await route.save();
+						res.status(200).send('Route created');
+					}catch(error){
+						res.status(422).send(error);
+					}
+				}else{
+					res.status(500).json({error: 'Došlo je do preklapanja vožnji.'});
+				}
+	});
+	app.get('/api/route/myRoutes', passport.authenticate('jwt', { session: false }), async (req, res) => {
+		const MyRoute = new RouteController(req.user);
+		try{
+			const routes = await MyRoute.getAllMyRoutes();
+			res.status(200).send(routes);
+		}catch(error){
+			console.log(error);
+			res.status(422).send(error);
+		}
+	});
+
 	app.post('/api/route/search', passport.authenticate('jwt', { session: false }), async (req, res) => {
-		const wantedFreqencies = routeFreq(req.body.date);
+		const wantedFreqencies = routeFreq(req.body.dateString);
 		const routes = await Route.find({$and: [
 				{status: {$eq: "active"}}, 
 				{frequency: {$in: wantedFreqencies}}
 			]
 		});
-		
 		let result = searchRoutes(routes, req.body.startObj, req.body.endObj, req.body.distance);
 		try{
-
 			result = await decorateSearchObjects(result);
 			res.status(200).send(result);
 		}catch(error){

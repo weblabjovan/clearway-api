@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const keys = require('./keys/keys');
 const passport = require('passport');
+const nodeDate = require('./helpers/nodeDate');
 
 require('./models/User');
 
@@ -19,7 +20,7 @@ app.use(passport.session());
 require('./routes/authRoutes')(app);
 require('./routes/routeRoutes')(app);
 require('./routes/uploadRoutes')(app);
-require('./routes/reservationRoutes')(app);
+require('./routes/rideRoutes')(app);
 
 
 const PORT = process.env.PORT || 5000;
