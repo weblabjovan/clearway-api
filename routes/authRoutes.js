@@ -122,12 +122,16 @@ module.exports = app => {
 				username: sign_username,
 				email: sign_email,
 				password: sign_pass,
+				driverSumm: 0,
+				driverNo: 0,
+				passengerSumm: 0,
+				passengerNo: 0,
 				date: new Date()
 			})
 			
 			try{
 				const recipient = [sign_email];
-				const mailer = new Mailer('Welcome to Claro', recipient, welcomeTemplate(newUser));
+				const mailer = new Mailer('Welcome to Clear Way', recipient, welcomeTemplate(newUser));
 				await mailer.send();
 				await newUser.save();
 				const token = jsonWebToken(newUser);

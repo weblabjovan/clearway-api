@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const keys = require('./keys/keys');
 const passport = require('passport');
-const nodeDate = require('./helpers/nodeDate');
+const dailyOperations = require('./helpers/dailyOperations');
 
 require('./models/User');
 
@@ -21,7 +21,9 @@ require('./routes/authRoutes')(app);
 require('./routes/routeRoutes')(app);
 require('./routes/uploadRoutes')(app);
 require('./routes/rideRoutes')(app);
+require('./routes/ratingRoutes')(app);
 
+dailyOperations.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

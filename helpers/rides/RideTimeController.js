@@ -20,6 +20,28 @@ class RideTimeController{
 		return rides;
 	}
 
+	async getReservationsForRate(){
+		const today = new Date().getTime();
+
+		const reservations = await this.ride.find(
+				{dateNumber: {'$lte':today}, status: 'active'}
+			)
+			.select('reservations route.user route._id');
+
+		return reservations;
+	}
+
+	async deactivateRides() {
+		const today = new Date().getTime();
+
+		const rides = await this.ride.update(
+			{dateNumber: {'$lte':today}, status: 'active'},
+			{$set: {status: 'done'}}
+		);
+
+		return rides;
+	}
+
 	async getRouteRideOnDate(route, date){
 		const today = this.dateOp.calculateDateNumber(date) + 86400;
 		const ride = await this.ride.findOne({
@@ -32,9 +54,7 @@ class RideTimeController{
 	}
 
 	async isRideOverLapping(date, time) {
-		console.log(date);
 		const rides = await this.getMyRidesOnDate(date);
-		console.log(rides);
 		for (var i = 0; i < rides.length; i++) {
 			if (!this.dateOp.isTimeDifferenceBiggerThanOneHour(this.dateOp.calculateTimeNumber(rides[i].route.time), this.dateOp.calculateTimeNumber(time))) {
 				return true;

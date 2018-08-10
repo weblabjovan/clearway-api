@@ -19,7 +19,11 @@ const userSchema = new Schema({
 		modelNumber: {type: String},
 		modelYear: {type: Number},
 		photo: {type: String}
-	}
+	},
+	driverSumm: {type: Number, default: 0},
+	driverNo: {type: Number, default: 0},
+	passengerSumm: {type: Number, default: 0},
+	passengerNo: {type: Number, default: 0}
 });
 
 userSchema.pre('save', async function(next) {

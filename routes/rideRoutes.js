@@ -7,13 +7,18 @@ const jsonWebToken = require('../helpers/jsonWebToken');
 const nodeDate = require('../helpers/nodeDate');
 const RideController = require('../helpers/rides/RideController');
 const RideTimeController = require('../helpers/rides/RideTimeController');
+const RatingController = require('../helpers/ratings/RatingController');
 
 module.exports = app => {
 	
 	app.post('/api/ride/save', passport.authenticate('jwt', { session: false }), async (req, res) => {	
 		const MyRide = new RideController(req.user);
 		const MyRideTime = new RideTimeController(req.user);
+		const ratingController = new RatingController();
 
+		if (!await ratingController.isForNewReservation(req.user._id)) { 
+			res.status(422).send({error: 'Nedostupno zbog neocenjenih vožnji'}); 
+		}
 		const route = await Route.findById(req.body.route , function(err, route) {
 			if (err) return res.status(400).send(err);
 			return route;

@@ -92,6 +92,20 @@ class RideController{
 		return await this.prepareDriverRides(rides);
 	}
 
+	async getRideForRating(reservationId) {
+		const reservations = await this.ride.findOne({
+			'reservations._id': reservationId
+		}).select('reservations route.time dateNumber');
+
+		const res = reservations.reservations.filter( reservation => {
+			if (reservation._id == reservationId) {
+				return reservation;
+			};
+		});
+		
+		return {reservation: res[0], time: reservations.route.time, date: reservations.dateNumber};
+	}
+
 }
 
 module.exports = RideController;
