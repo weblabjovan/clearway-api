@@ -8,12 +8,6 @@ const nodeDate = {
 	init: function(date){
 		this.date = date;
 	},
-	createDate: function() {
-		return moment(this.date).utcOffset(this.offset).format();
-	},
-	setDateToStart: function() {
-		return moment(this.date).utcOffset(this.offset).startOf('day').toString();
-	},
 	getOnlyTime: function() {
 		return moment(momentZone.tz(this.date, this.timezone).format()).format('HH:mm');
 	},

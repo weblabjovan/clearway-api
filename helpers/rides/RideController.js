@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Ride = require('../../models/Ride');
 const userDecorater = require('../users/userDecorater');
 
@@ -30,6 +29,13 @@ class RideController{
 	}
 
 	async changeReservationStatus(id, status) {
+		if (typeof id != 'string' || typeof status != 'string') {
+			throw new Error('Internal server error: params type not correct');
+		}
+		if (!id.trim() || !status.trim()) {
+			throw new Error('Internal server error: params not defined');
+		}
+
 		let change = true;
 		if (status == 'canceled' || status == 'declined') {
 			change = false;
@@ -40,9 +46,27 @@ class RideController{
 		)
 	}
 
+	async setBackReservationStatus(id) {
+		const ride = await this.ride.findOneAndUpdate(
+			{'reservations._id': id },
+			{$set: {'reservations.$.status': 'sent', 'reservations.$.statusChange': true}}
+		)
+	}
+
+	async getRideById(id){
+		const ride = await this.ride.findOne(
+			{'_id': id }
+		);
+
+		return ride;
+	}
+
 	async preparePassangerRides(rides) {
 		const res = [];
 		for (var i = 0; i < rides.length; i++) {
+			if (rides[i] instanceof Ride == false) {
+				throw new Error('Internal server error: ride object is not of correct type');
+			}
 			const newRoute = await userDecorater(rides[i].route);
 			rides[i].newRoute = newRoute;
 
@@ -70,6 +94,9 @@ class RideController{
 
 	async prepareDriverRides(rides) {
 		const newRides = await Promise.all( rides.map( async (ride) => {
+			if (ride instanceof Ride == false) {
+				throw new Error('Internal server error: ride object is not of correct type');
+			}
 			const newResArr = await Promise.all(ride.reservations.map( async (reservation) => {
 				const newRes = await userDecorater(reservation);
 
@@ -93,6 +120,9 @@ class RideController{
 	}
 
 	async getRideForRating(reservationId) {
+		if (typeof reservationId != 'string' || !reservationId.trim()) {
+			throw new Error('Internal server error: reservationId is not defined');
+		}
 		const reservations = await this.ride.findOne({
 			'reservations._id': reservationId
 		}).select('reservations route.time dateNumber');

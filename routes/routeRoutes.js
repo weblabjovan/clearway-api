@@ -6,12 +6,7 @@ const jsonWebToken = require('../helpers/jsonWebToken');
 const nodeDate = require('../helpers/nodeDate');
 const RouteController = require('../helpers/routes/RouteController');
 const RouteTimeController = require('../helpers/routes/RouteTimeController');
-
 const stepsDecorator = require('../helpers/routes/stepsDecorator');
-const searchRoutes = require('../helpers/routes/searchRoutes');
-const routeFreq = require('../helpers/routes/routeFrequencySearcher');
-const decorateSearchObjects = require('../helpers/routes/decorateSearchObjects');
-const prepareRouteForReservation = require('../helpers/routes/prepareRouteForReservation');
 
 module.exports = app => {
 	app.post('/api/route/delete', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -74,15 +69,17 @@ module.exports = app => {
 	});
 
 	app.post('/api/route/search', passport.authenticate('jwt', { session: false }), async (req, res) => {
-		const wantedFreqencies = routeFreq(req.body.dateString);
+		const MyRoute = new RouteController(req.user);
+		const MyTimeRoute = new RouteTimeController(req.user);
+		const wantedFreqencies = MyTimeRoute.frequncyMatcher(req.body.dateString);
 		const routes = await Route.find({$and: [
 				{status: {$eq: "active"}}, 
 				{frequency: {$in: wantedFreqencies}}
 			]
 		});
-		let result = searchRoutes(routes, req.body.startObj, req.body.endObj, req.body.distance);
+		let result = MyRoute.searchRoutes(routes, req.body.startObj, req.body.endObj, req.body.distance);
 		try{
-			result = await decorateSearchObjects(result);
+			result = await MyRoute.decorateSearchObjects(result);
 			res.status(200).send(result);
 		}catch(error){
 			res.status(422).send(error);
@@ -90,13 +87,15 @@ module.exports = app => {
 	})
 
 	app.post('/api/route/getRouteForApplication', passport.authenticate('jwt', { session: false }), async (req, res) => {
+		const MyRoute = new RouteController(req.user);
 		const route = await Route.findById(req.body.routeId , function(err, route) {
 			if (err) return res.status(400).send(err);
 			return route;
 		});
 		
 		try{
-			const result = await prepareRouteForReservation(route, req.body.params);
+			console.log(req.body.params);
+			const result = await MyRoute.prepareRouteForReservation(route, req.body.params);
 			res.status(200).send(result);
 		}catch(error){
 			console.log(error);

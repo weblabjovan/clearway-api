@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Ride = require('../../models/Ride');
 const nodeDate = require('../nodeDate');
 
@@ -10,6 +9,9 @@ class RideTimeController{
 	}
 
 	async getMyRidesOnDate(date) {
+		if (typeof date != 'string' || !date.trim()) {
+			throw new Error('Internal server error: date is not defined');
+		}
 		const today = this.dateOp.calculateDateNumber(date) + 86400;
 		const rides = await this.ride.find({
 			status: {'$eq': 'active'},
@@ -43,6 +45,12 @@ class RideTimeController{
 	}
 
 	async getRouteRideOnDate(route, date){
+		if (typeof route != 'string' || !route.trim()) {
+			throw new Error('Internal server error: route is not defined');
+		}
+		if (typeof date != 'string' || !date.trim()) {
+			throw new Error('Internal server error: date is not defined');
+		}
 		const today = this.dateOp.calculateDateNumber(date) + 86400;
 		const ride = await this.ride.findOne({
 			'route._id': {'$eq': route},
@@ -54,6 +62,12 @@ class RideTimeController{
 	}
 
 	async isRideOverLapping(date, time) {
+		if (typeof date != 'string' || !date.trim()) {
+			throw new Error('Internal server error: date is not defined');
+		}
+		if (typeof time != 'string' || !time.trim() || time.length != 5) {
+			throw new Error('Internal server error: time is not defined');
+		}
 		const rides = await this.getMyRidesOnDate(date);
 		for (var i = 0; i < rides.length; i++) {
 			if (!this.dateOp.isTimeDifferenceBiggerThanOneHour(this.dateOp.calculateTimeNumber(rides[i].route.time), this.dateOp.calculateTimeNumber(time))) {

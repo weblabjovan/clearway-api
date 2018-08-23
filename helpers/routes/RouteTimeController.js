@@ -9,7 +9,37 @@ class RouteTimeController {
 		this.dateOp = Object.create(nodeDate);
 	}
 
+	frequncyMatcher(date) {
+		if (!date || new Date(date).toISOString() != date) {
+			throw new Error('Internal Server Error: date not properly defined');
+		}
+
+		let freq = [3];
+		this.dateOp.init(date);
+
+		if (this.dateOp.isWeekend()) {
+			freq.push(5);
+		}else{
+			freq.push(4);
+		}
+
+		if (this.dateOp.isToday()) {
+			freq.push(1);
+		}else{
+			freq.push(2);
+		}
+
+		return freq;
+	}
+
 	isRouteOverlap(routeObj, timeNumber, frequency, date) {
+		if (routeObj instanceof Route == false) {
+			throw new Error('Internal server error: route object is not of correct type');
+		}
+		if (typeof timeNumber != 'number' || typeof frequency != 'number') {
+			throw new Error('Internal server error: timeNumber or frequency are not of correct type');
+		}
+
 		this.dateOp.init(new Date());
 		if (!this.dateOp.isTimeDifferenceBiggerThanOneHour(routeObj.timeNumber, timeNumber)) {
 			let forbiden = [3];
@@ -39,7 +69,10 @@ class RouteTimeController {
 						forbiden.push(4);
 					}
 				}else{
-					forbiden.push(routeObj.frequency);
+					if (routeObj.frequency != 1) {
+						forbiden.push(routeObj.frequency);
+					}
+					
 				}
 			}
 			
@@ -54,6 +87,9 @@ class RouteTimeController {
 	}
 
 	async areMyRoutesOverlaping(time, frequency, date) {
+		if (frequency == 2 && isNaN(Date.parse(date))) {
+			throw new Error('Internal Server Error: params not properly defined');
+		}
 		const routes = await this.route.find({$and: [
 				{status: {$eq: "active"}}, 
 				{user: {$eq: this.user.id }}
