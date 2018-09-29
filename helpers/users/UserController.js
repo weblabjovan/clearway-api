@@ -14,6 +14,15 @@ class UserController{
 		return user;
 	}
 
+	async isUser(userId) {
+		const user = this.getUserById(userId);
+		if (user) {
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	async updateUserRating(data) {
 		let update = {};
 		if (data.type == 'driver') {

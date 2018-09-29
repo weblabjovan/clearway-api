@@ -15,8 +15,8 @@ module.exports = app => {
 		const MyRide = new RideController(req.user);
 		const MyRideTime = new RideTimeController(req.user);
 		const ratingController = new RatingController();
-
-		if (!await ratingController.isForNewReservation(req.user._id)) { 
+		
+		if (await ratingController.isForNewReservation(req.user._id) === false) { 
 			res.status(422).send({error: 'Nedostupno zbog neocenjenih vožnji'}); 
 		}
 		const route = await Route.findById(req.body.route , function(err, route) {
