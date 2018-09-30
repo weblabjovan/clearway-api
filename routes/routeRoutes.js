@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Route = require('../models/Route');
 const passport = require('passport');
 const passportConf = require('../helpers/passport');

@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Reservation = require('../models/Reservation');
 const passport = require('passport');
 const passportConf = require('../helpers/passport');
