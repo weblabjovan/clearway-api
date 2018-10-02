@@ -39,7 +39,7 @@ module.exports = app => {
 			await mailer.send();
 			res.status(200).send({email: req.body.email});
 		}else{
-			res.status(400).json({error: 'Ne postoji korisnik sa unetim emailom.'});
+			res.status(422).json({error: 'Ne postoji korisnik sa unetim emailom.'});
 		}
 	});
 
@@ -50,7 +50,7 @@ module.exports = app => {
 			await User.update({_id: user.id}, {passcode: ''});
 			res.status(200).send({passcode: true});
 		}else{
-			res.status(400).json({error: 'Nevalidan kod za promenu lozinke'});
+			res.status(422).json({error: 'Nevalidan kod za promenu lozinke'});
 		}
 
 	});
@@ -64,7 +64,7 @@ module.exports = app => {
 			await User.update({_id: user.id}, {password: passHash});
 			res.status(200).send({change: true});
 		}else{
-			res.status(400).json({error: 'Server problems please refresh the page'});
+			res.status(401).json({error: 'Server problems please refresh the page'});
 		}
 	})
 
@@ -81,7 +81,7 @@ module.exports = app => {
 			const token = jsonWebToken(req.user);
 			res.status(200).send(token);
 		}else{
-			res.status(400).json({error: 'Ne postoji korisnik sa unetim podacima'});
+			res.status(401).json({error: 'Ne postoji korisnik sa unetim podacima'});
 		}
 	});
 

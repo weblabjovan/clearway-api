@@ -15,7 +15,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(passport.initialize());
-app.use(passport.session());
 
 require('./routes/authRoutes')(app);
 require('./routes/routeRoutes')(app);

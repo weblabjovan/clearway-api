@@ -50,10 +50,10 @@ module.exports = app => {
 						await route.save();
 						res.status(200).send('Route created');
 					}catch(error){
-						res.status(422).send(error);
+						res.status(500).send(error);
 					}
 				}else{
-					res.status(500).json({error: 'Došlo je do preklapanja vožnji.'});
+					res.status(401).json({error: 'Došlo je do preklapanja vožnji.'});
 				}
 	});
 	app.get('/api/route/myRoutes', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -63,7 +63,7 @@ module.exports = app => {
 			res.status(200).send(routes);
 		}catch(error){
 			console.log(error);
-			res.status(422).send(error);
+			res.status(500).send(error);
 		}
 	});
 
@@ -81,7 +81,7 @@ module.exports = app => {
 			result = await MyRoute.decorateSearchObjects(result);
 			res.status(200).send(result);
 		}catch(error){
-			res.status(422).send(error);
+			res.status(500).send(error);
 		}
 	})
 
@@ -98,7 +98,7 @@ module.exports = app => {
 			res.status(200).send(result);
 		}catch(error){
 			console.log(error);
-			res.status(422).send(error);
+			res.status(500).send(error);
 		}
 	})
 }

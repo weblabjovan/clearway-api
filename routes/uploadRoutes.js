@@ -27,7 +27,7 @@ module.exports = app => {
 
 			res.status(200).send({key, url});
 		}else{
-			res.status(422);
+			res.status(401).json({error: 'Neautorizovano korišćenje.' });
 		}
 		
 	})

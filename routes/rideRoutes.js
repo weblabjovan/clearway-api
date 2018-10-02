@@ -16,10 +16,10 @@ module.exports = app => {
 		const ratingController = new RatingController();
 		
 		if (await ratingController.isForNewReservation(req.user._id) === false) { 
-			res.status(422).send({error: 'Nedostupno zbog neocenjenih vožnji'}); 
+			res.status(403).send({error: 'Nedostupno zbog neocenjenih vožnji'}); 
 		}
 		const route = await Route.findById(req.body.route , function(err, route) {
-			if (err) return res.status(400).send(err);
+			if (err) return res.status(500).send(err);
 			return route;
 		});
 
@@ -44,7 +44,7 @@ module.exports = app => {
 						res.status(200).send('Updejtovana vožnja.');
 					}catch(error){
 						console.log(error);
-						res.status(422).send(error);
+						res.status(500).send(error);
 					}
 				}
 			}
@@ -60,10 +60,10 @@ module.exports = app => {
 					res.status(200).send('Kreirana vožnja.');
 				}catch(error){
 					console.log(error);
-					res.status(422).send(error);
+					res.status(500).send(error);
 				}
 			}else{
-				res.status(500).json({error: 'Došlo je do preklapanja vožnji.' });
+				res.status(401).json({error: 'Došlo je do preklapanja vožnji.' });
 			}
 		}
 	});
@@ -78,7 +78,7 @@ module.exports = app => {
 			res.status(200).send(myRides);
 		}catch(error){
 			console.log(error);
-			res.status(422).send(error);
+			res.status(500).send(error);
 		}
 		
 	});
@@ -94,7 +94,7 @@ module.exports = app => {
 			res.status(200).send(myRides);
 		}catch(error){
 			console.log(error);
-			res.status(422).send(error);
+			res.status(500).send(error);
 		}
 	})
 }
